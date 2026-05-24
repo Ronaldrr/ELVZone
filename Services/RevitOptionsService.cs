@@ -1,0 +1,58 @@
+using System.Collections.Generic;
+using System.Linq;
+using Autodesk.Revit.DB;
+
+namespace ELVZone.Services
+{
+    public class RevitOptionsService
+    {
+        public IList<string> GetParameterNames(Document document)
+        {
+            var names = new SortedSet<string>();
+            var collector = new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .Take(500);
+
+            foreach (var element in collector)
+            {
+                foreach (Parameter parameter in element.Parameters)
+                {
+                    var name = parameter.Definition?.Name;
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        names.Add(name);
+                    }
+                }
+            }
+
+            return names.ToList();
+        }
+
+        public IList<string> GetFilledRegionTypeNames(Document document)
+        {
+            return new FilteredElementCollector(document)
+                .OfClass(typeof(FilledRegionType))
+                .Cast<FilledRegionType>()
+                .Select(type => type.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .OrderBy(name => name)
+                .ToList();
+        }
+
+        public IList<string> GetLineStyleNames(Document document)
+        {
+            var names = new SortedSet<string>();
+            var lines = document.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
+
+            foreach (Category category in lines.SubCategories)
+            {
+                if (!string.IsNullOrWhiteSpace(category.Name))
+                {
+                    names.Add(category.Name);
+                }
+            }
+
+            return names.ToList();
+        }
+    }
+}

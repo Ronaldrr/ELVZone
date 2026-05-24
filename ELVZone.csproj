@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>ELVZone</AssemblyName>
+    <RootNamespace>ELVZone</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <REVIT2022_API Condition="'$(REVIT2022_API)' == ''">C:\Program Files\Autodesk\Revit 2022</REVIT2022_API>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="ELVZone.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>$(REVIT2022_API)\RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(REVIT2022_API)\RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
