@@ -11,5 +11,7 @@ namespace ELVZone.Geometry
         public double MountingHeightFeet { get; set; }
         public double[] ZoneLengthsFeet { get; set; }
         public double TotalLengthFeet { get; set; }
+        public double AnalysisBottomHeightFeet { get; set; }
+        public double AnalysisTopHeightFeet { get; set; }
     }
 }

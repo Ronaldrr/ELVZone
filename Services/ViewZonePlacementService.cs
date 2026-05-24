@@ -9,22 +9,24 @@ namespace ELVZone.Services
     public class ViewZonePlacementService
     {
         private readonly ViewZoneGeometryBuilder _geometryBuilder = new ViewZoneGeometryBuilder();
+        private readonly ArchitectureObstacleService _obstacleService = new ArchitectureObstacleService();
 
         public int PlaceZones(Document document, ViewPlan view, CameraViewZoneData data, ViewZoneSettings settings)
         {
             var elevation = view.GenLevel != null ? view.GenLevel.Elevation : data.Origin.Z;
-            var boundaries = _geometryBuilder.BuildZoneBoundaries(data, elevation);
+            var obstacles = _obstacleService.Collect(document, view);
+            var boundaries = _geometryBuilder.BuildZoneBoundaries(data, elevation, obstacles);
             var placed = 0;
 
-            for (var i = 0; i < boundaries.Count; i++)
+            foreach (var boundary in boundaries)
             {
-                var curves = boundaries[i];
+                var curves = boundary.Curves;
                 if (curves.Count == 0)
                 {
                     continue;
                 }
 
-                var style = settings.ZoneStyles[i];
+                var style = settings.ZoneStyles[boundary.ZoneIndex];
                 if (style.FillEnabled)
                 {
                     var filledRegionType = FindFilledRegionType(document, style.FilledRegionTypeName);

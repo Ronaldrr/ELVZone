@@ -7,6 +7,7 @@ namespace ELVZone.Services
 {
     public class CameraDataFactory
     {
+        private const double FeetPerMeter = 3.280839895013123;
         private readonly ElementParameterReader _parameterReader = new ElementParameterReader();
 
         public CameraViewZoneData Create(Element camera, ViewZoneSettings settings)
@@ -40,7 +41,9 @@ namespace ELVZone.Services
                 TotalLengthFeet = _parameterReader.ReadLengthFeet(
                     camera,
                     settings.TotalLengthParameter,
-                    settings.DefaultTotalLengthMeters)
+                    settings.DefaultTotalLengthMeters),
+                AnalysisBottomHeightFeet = settings.AnalysisBottomHeightMeters * FeetPerMeter,
+                AnalysisTopHeightFeet = settings.AnalysisTopHeightMeters * FeetPerMeter
             };
         }
 

@@ -7,92 +7,240 @@ namespace ELVZone.Geometry
     public class ViewZoneGeometryBuilder
     {
         private const double MinLength = 0.001;
+        private const double RayTolerance = 0.01;
 
-        public IList<IList<Curve>> BuildZoneBoundaries(CameraViewZoneData data, double planeElevation)
+        public IList<ViewZoneBoundarySet> BuildZoneBoundaries(
+            CameraViewZoneData data,
+            double planeElevation,
+            IList<PlanObstacleSegment> obstacles)
         {
-            var result = new List<IList<Curve>>();
+            var result = new List<ViewZoneBoundarySet>();
             var origin = new XYZ(data.Origin.X, data.Origin.Y, planeElevation);
             var direction = NormalizePlanVector(data.Direction);
             var halfAngle = Math.Max(0.001, data.HorizontalAngleRadians / 2.0);
-            var currentRadius = 0.0;
             var totalRadius = Math.Max(0, data.TotalLengthFeet);
+            var rays = BuildVisibilityRays(
+                origin,
+                direction,
+                halfAngle,
+                totalRadius,
+                data,
+                planeElevation,
+                obstacles ?? new List<PlanObstacleSegment>());
+            var innerRadius = 0.0;
 
             for (var i = 0; i < 4; i++)
             {
                 var zoneLength = data.ZoneLengthsFeet[i];
-                var nextRadius = Math.Min(totalRadius, currentRadius + Math.Max(0, zoneLength));
-                if (nextRadius - currentRadius > MinLength)
+                var outerRadius = Math.Min(totalRadius, innerRadius + Math.Max(0, zoneLength));
+                if (outerRadius - innerRadius > MinLength)
                 {
-                    result.Add(BuildZoneBoundary(origin, direction, halfAngle, currentRadius, nextRadius));
-                }
-                else
-                {
-                    result.Add(new List<Curve>());
+                    foreach (var boundary in BuildClippedZoneBoundaries(rays, innerRadius, outerRadius))
+                    {
+                        result.Add(new ViewZoneBoundarySet(i, boundary));
+                    }
                 }
 
-                currentRadius = nextRadius;
+                innerRadius = outerRadius;
             }
 
             return result;
         }
 
-        private static IList<Curve> BuildZoneBoundary(
+        private static IList<VisibilityRay> BuildVisibilityRays(
             XYZ origin,
             XYZ direction,
             double halfAngle,
-            double innerRadius,
-            double outerRadius)
+            double totalRadius,
+            CameraViewZoneData data,
+            double planeElevation,
+            IList<PlanObstacleSegment> obstacles)
         {
-            var points = new List<XYZ>();
-            if (innerRadius <= MinLength)
-            {
-                points.Add(origin);
-                points.AddRange(BuildArcPoints(origin, direction, outerRadius, -halfAngle, halfAngle));
-            }
-            else
-            {
-                points.Add(PointOnRay(origin, direction, innerRadius, -halfAngle));
-                points.Add(PointOnRay(origin, direction, outerRadius, -halfAngle));
-                points.AddRange(BuildArcPoints(origin, direction, outerRadius, -halfAngle, halfAngle, skipFirst: true));
-                points.AddRange(BuildArcPoints(origin, direction, innerRadius, halfAngle, -halfAngle));
-            }
-
-            return CreateLoopCurves(points);
-        }
-
-        private static IList<XYZ> BuildArcPoints(
-            XYZ origin,
-            XYZ direction,
-            double radius,
-            double startAngle,
-            double endAngle,
-            bool skipFirst = false)
-        {
-            var angle = Math.Abs(endAngle - startAngle);
-            var segments = Math.Max(8, Math.Min(48, (int)Math.Ceiling(angle / (Math.PI / 48.0))));
-            var points = new List<XYZ>();
+            var segments = Math.Max(24, Math.Min(144, (int)Math.Ceiling((halfAngle * 2.0) / (Math.PI / 90.0))));
+            var rays = new List<VisibilityRay>();
 
             for (var i = 0; i <= segments; i++)
             {
-                if (skipFirst && i == 0)
+                var t = (double)i / segments;
+                var angle = -halfAngle + halfAngle * 2.0 * t;
+                var rayDirection = RotatePlanVector(direction, angle);
+                var distance = FindNearestObstacleDistance(
+                    origin,
+                    rayDirection,
+                    totalRadius,
+                    data,
+                    planeElevation,
+                    obstacles);
+                rays.Add(new VisibilityRay(origin, rayDirection, angle, distance));
+            }
+
+            return rays;
+        }
+
+        private static IList<IList<Curve>> BuildClippedZoneBoundaries(
+            IList<VisibilityRay> rays,
+            double innerRadius,
+            double outerRadius)
+        {
+            var boundaries = new List<IList<Curve>>();
+            var current = new List<VisibilityRay>();
+
+            foreach (var ray in rays)
+            {
+                if (ray.Distance > innerRadius + MinLength)
                 {
+                    current.Add(ray);
                     continue;
                 }
 
-                var t = (double)i / segments;
-                var currentAngle = startAngle + (endAngle - startAngle) * t;
-                points.Add(PointOnRay(origin, direction, radius, currentAngle));
+                AddBoundaryIfValid(current, innerRadius, outerRadius, boundaries);
+                current.Clear();
             }
 
-            return points;
+            AddBoundaryIfValid(current, innerRadius, outerRadius, boundaries);
+            return boundaries;
         }
 
-        private static XYZ PointOnRay(XYZ origin, XYZ direction, double radius, double angle)
+        private static void AddBoundaryIfValid(
+            IList<VisibilityRay> rays,
+            double innerRadius,
+            double outerRadius,
+            IList<IList<Curve>> boundaries)
+        {
+            if (rays.Count < 2)
+            {
+                return;
+            }
+
+            var points = new List<XYZ>();
+            if (innerRadius <= MinLength)
+            {
+                points.Add(PointAt(rays[0], 0));
+            }
+            else
+            {
+                points.Add(PointAt(rays[0], innerRadius));
+            }
+
+            foreach (var ray in rays)
+            {
+                var visibleOuterRadius = Math.Min(outerRadius, ray.Distance);
+                if (visibleOuterRadius > innerRadius + MinLength)
+                {
+                    points.Add(PointAt(ray, visibleOuterRadius));
+                }
+            }
+
+            if (innerRadius > MinLength)
+            {
+                for (var i = rays.Count - 1; i >= 0; i--)
+                {
+                    points.Add(PointAt(rays[i], innerRadius));
+                }
+            }
+
+            var curves = CreateLoopCurves(points);
+            if (curves.Count >= 3)
+            {
+                boundaries.Add(curves);
+            }
+        }
+
+        private static double FindNearestObstacleDistance(
+            XYZ origin,
+            XYZ rayDirection,
+            double maxDistance,
+            CameraViewZoneData data,
+            double planeElevation,
+            IList<PlanObstacleSegment> obstacles)
+        {
+            var nearest = maxDistance;
+            foreach (var obstacle in obstacles)
+            {
+                if (TryIntersectRaySegment(origin, rayDirection, obstacle.Start, obstacle.End, out var distance) &&
+                    distance > RayTolerance &&
+                    distance < nearest &&
+                    IntersectsVerticalAnalysisWindow(data, planeElevation, distance, obstacle))
+                {
+                    nearest = distance;
+                }
+            }
+
+            return nearest;
+        }
+
+        private static bool IntersectsVerticalAnalysisWindow(
+            CameraViewZoneData data,
+            double planeElevation,
+            double distance,
+            PlanObstacleSegment obstacle)
+        {
+            var halfVerticalAngle = Math.Max(0.001, data.VerticalAngleRadians / 2.0);
+            var cameraZ = planeElevation + data.MountingHeightFeet;
+            var verticalOffset = distance * Math.Tan(halfVerticalAngle);
+            var viewBottom = cameraZ - verticalOffset;
+            var viewTop = cameraZ + verticalOffset;
+            var analysisBottom = planeElevation + data.AnalysisBottomHeightFeet;
+            var analysisTop = planeElevation + data.AnalysisTopHeightFeet;
+
+            if (analysisTop < analysisBottom)
+            {
+                var temp = analysisBottom;
+                analysisBottom = analysisTop;
+                analysisTop = temp;
+            }
+
+            var effectiveBottom = Math.Max(viewBottom, analysisBottom);
+            var effectiveTop = Math.Min(viewTop, analysisTop);
+            if (effectiveTop < effectiveBottom)
+            {
+                return false;
+            }
+
+            return obstacle.MaxZ >= effectiveBottom && obstacle.MinZ <= effectiveTop;
+        }
+
+        private static bool TryIntersectRaySegment(
+            XYZ rayOrigin,
+            XYZ rayDirection,
+            XYZ segmentStart,
+            XYZ segmentEnd,
+            out double distance)
+        {
+            distance = 0;
+            var segment = segmentEnd - segmentStart;
+            var denominator = Cross2D(rayDirection, segment);
+            if (Math.Abs(denominator) < 1e-9)
+            {
+                return false;
+            }
+
+            var diff = segmentStart - rayOrigin;
+            var rayParameter = Cross2D(diff, segment) / denominator;
+            var segmentParameter = Cross2D(diff, rayDirection) / denominator;
+            if (rayParameter < 0 || segmentParameter < 0 || segmentParameter > 1)
+            {
+                return false;
+            }
+
+            distance = rayParameter;
+            return true;
+        }
+
+        private static XYZ PointAt(VisibilityRay ray, double radius)
+        {
+            return ray.Origin + ray.Direction.Multiply(radius);
+        }
+
+        private static XYZ RotatePlanVector(XYZ direction, double angle)
         {
             var left = new XYZ(-direction.Y, direction.X, 0);
-            return origin
-                + direction.Multiply(Math.Cos(angle) * radius)
-                + left.Multiply(Math.Sin(angle) * radius);
+            return (direction.Multiply(Math.Cos(angle)) + left.Multiply(Math.Sin(angle))).Normalize();
+        }
+
+        private static double Cross2D(XYZ first, XYZ second)
+        {
+            return first.X * second.Y - first.Y * second.X;
         }
 
         private static IList<Curve> CreateLoopCurves(IList<XYZ> points)
@@ -119,6 +267,22 @@ namespace ELVZone.Geometry
             }
 
             return plan.Normalize();
+        }
+
+        private class VisibilityRay
+        {
+            public double Angle { get; }
+            public double Distance { get; }
+            public XYZ Origin { get; }
+            public XYZ Direction { get; }
+
+            public VisibilityRay(XYZ origin, XYZ direction, double angle, double distance)
+            {
+                Origin = origin;
+                Direction = direction;
+                Angle = angle;
+                Distance = distance;
+            }
         }
     }
 }

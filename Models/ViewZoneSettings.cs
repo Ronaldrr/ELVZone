@@ -57,6 +57,12 @@ namespace ELVZone.Models
         [DataMember(Order = 17)]
         public double DefaultTotalLengthMeters { get; set; }
 
+        [DataMember(Order = 18)]
+        public double AnalysisBottomHeightMeters { get; set; }
+
+        [DataMember(Order = 19)]
+        public double AnalysisTopHeightMeters { get; set; }
+
         public static ViewZoneSettings CreateDefault()
         {
             return new ViewZoneSettings
@@ -83,7 +89,9 @@ namespace ELVZone.Models
                 DefaultZone2LengthMeters = 5,
                 DefaultZone3LengthMeters = 5,
                 DefaultZone4LengthMeters = 5,
-                DefaultTotalLengthMeters = 20
+                DefaultTotalLengthMeters = 20,
+                AnalysisBottomHeightMeters = 0,
+                AnalysisTopHeightMeters = 2
             };
         }
 
@@ -98,6 +106,10 @@ namespace ELVZone.Models
             Zone4LengthParameter = Zone4LengthParameter ?? new ParameterSetting();
             TotalLengthParameter = TotalLengthParameter ?? new ParameterSetting();
             ZoneStyles = ZoneStyles ?? new List<ZoneStyleSetting>();
+            if (AnalysisTopHeightMeters <= AnalysisBottomHeightMeters)
+            {
+                AnalysisTopHeightMeters = AnalysisBottomHeightMeters + 2;
+            }
 
             while (ZoneStyles.Count < 4)
             {
