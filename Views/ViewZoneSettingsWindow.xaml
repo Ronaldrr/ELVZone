@@ -37,10 +37,10 @@
     <DockPanel Margin="18">
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <TextBlock Text="{Binding StatusMessage}" MinWidth="260" Foreground="#406070"/>
-            <Button Content="Импорт" Command="{Binding ImportCommand}"/>
-            <Button Content="Экспорт" Command="{Binding ExportCommand}"/>
-            <Button Content="Сброс" Command="{Binding ResetCommand}"/>
-            <Button Content="Сохранить" Command="{Binding SaveCommand}" FontWeight="SemiBold"/>
+            <Button Content="Импорт" Click="ImportButton_Click"/>
+            <Button Content="Экспорт" Click="ExportButton_Click"/>
+            <Button Content="Сброс" Click="ResetButton_Click"/>
+            <Button Content="Сохранить" Click="SaveButton_Click" FontWeight="SemiBold"/>
         </StackPanel>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -147,14 +147,16 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="{Binding Title}"/>
-                                    <CheckBox Grid.Column="1" Content="Вкл." IsChecked="{Binding Style.FillEnabled}"/>
+                                    <CheckBox Grid.Column="1" Content="Вкл." IsChecked="{Binding FillEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ComboBox Grid.Column="2"
                                               ItemsSource="{Binding DataContext.FilledRegionTypeNames, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              Text="{Binding Style.FilledRegionTypeName, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Grid.Column="3" Content="Вкл." IsChecked="{Binding Style.LineEnabled}"/>
+                                              IsEditable="False"
+                                              SelectedItem="{Binding FilledRegionTypeName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <CheckBox Grid.Column="3" Content="Вкл." IsChecked="{Binding LineEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ComboBox Grid.Column="4"
                                               ItemsSource="{Binding DataContext.LineStyleNames, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              Text="{Binding Style.LineStyleName, UpdateSourceTrigger=PropertyChanged}"/>
+                                              IsEditable="False"
+                                              SelectedItem="{Binding LineStyleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

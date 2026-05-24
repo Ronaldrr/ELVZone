@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
+using Autodesk.Revit.DB;
 using ELVZone.Models;
 using ELVZone.Services;
 using Microsoft.Win32;
@@ -49,10 +51,11 @@ namespace ELVZone.ViewModels
             ViewZoneSettings settings,
             ViewZoneSettingsService settingsService,
             RevitOptionsService optionsService,
-            Autodesk.Revit.DB.Document document)
+            Document document,
+            IEnumerable<ElementId> preferredElementIds)
         {
             _settingsService = settingsService;
-            ParameterNames = new ObservableCollection<string>(optionsService.GetParameterNames(document));
+            ParameterNames = new ObservableCollection<string>(optionsService.GetParameterNames(document, preferredElementIds));
             FilledRegionTypeNames = new ObservableCollection<string>(optionsService.GetFilledRegionTypeNames(document));
             LineStyleNames = new ObservableCollection<string>(optionsService.GetLineStyleNames(document));
             ZoneRows = new ObservableCollection<ZoneStyleRowViewModel>();
@@ -68,8 +71,15 @@ namespace ELVZone.ViewModels
 
         private void Save()
         {
-            _settingsService.Save(Settings);
-            StatusMessage = "Настройки сохранены.";
+            try
+            {
+                _settingsService.Save(Settings);
+                StatusMessage = $"Настройки сохранены: {_settingsService.SettingsPath}";
+            }
+            catch (System.Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Ошибка сохранения настроек", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Import()
@@ -85,9 +95,16 @@ namespace ELVZone.ViewModels
                 return;
             }
 
-            Settings = _settingsService.LoadFrom(dialog.FileName);
-            _settingsService.Save(Settings);
-            StatusMessage = "Настройки импортированы.";
+            try
+            {
+                Settings = _settingsService.LoadFrom(dialog.FileName);
+                _settingsService.Save(Settings);
+                StatusMessage = "Настройки импортированы.";
+            }
+            catch (System.Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Ошибка импорта настроек", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Export()
@@ -104,8 +121,15 @@ namespace ELVZone.ViewModels
                 return;
             }
 
-            _settingsService.SaveTo(dialog.FileName, Settings);
-            StatusMessage = "Настройки экспортированы.";
+            try
+            {
+                _settingsService.SaveTo(dialog.FileName, Settings);
+                StatusMessage = "Настройки экспортированы.";
+            }
+            catch (System.Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Ошибка экспорта настроек", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Reset()

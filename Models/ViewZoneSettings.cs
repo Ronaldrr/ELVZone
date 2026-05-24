@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace ELVZone.Models
@@ -31,7 +31,7 @@ namespace ELVZone.Models
         public ParameterSetting TotalLengthParameter { get; set; }
 
         [DataMember(Order = 9)]
-        public ObservableCollection<ZoneStyleSetting> ZoneStyles { get; set; }
+        public List<ZoneStyleSetting> ZoneStyles { get; set; }
 
         [DataMember(Order = 10)]
         public double DefaultHorizontalAngleDegrees { get; set; }
@@ -69,7 +69,7 @@ namespace ELVZone.Models
                 Zone3LengthParameter = new ParameterSetting(),
                 Zone4LengthParameter = new ParameterSetting(),
                 TotalLengthParameter = new ParameterSetting(),
-                ZoneStyles = new ObservableCollection<ZoneStyleSetting>
+                ZoneStyles = new List<ZoneStyleSetting>
                 {
                     new ZoneStyleSetting(),
                     new ZoneStyleSetting(),
@@ -97,7 +97,7 @@ namespace ELVZone.Models
             Zone3LengthParameter = Zone3LengthParameter ?? new ParameterSetting();
             Zone4LengthParameter = Zone4LengthParameter ?? new ParameterSetting();
             TotalLengthParameter = TotalLengthParameter ?? new ParameterSetting();
-            ZoneStyles = ZoneStyles ?? new ObservableCollection<ZoneStyleSetting>();
+            ZoneStyles = ZoneStyles ?? new List<ZoneStyleSetting>();
 
             while (ZoneStyles.Count < 4)
             {

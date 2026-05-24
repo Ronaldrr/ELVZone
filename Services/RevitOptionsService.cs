@@ -6,23 +6,27 @@ namespace ELVZone.Services
 {
     public class RevitOptionsService
     {
-        public IList<string> GetParameterNames(Document document)
+        public IList<string> GetParameterNames(Document document, IEnumerable<ElementId> preferredElementIds = null)
         {
             var names = new SortedSet<string>();
-            var collector = new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .Take(500);
+            AddProjectParameterNames(document, names);
 
-            foreach (var element in collector)
+            if (preferredElementIds != null)
             {
-                foreach (Parameter parameter in element.Parameters)
+                foreach (var elementId in preferredElementIds)
                 {
-                    var name = parameter.Definition?.Name;
-                    if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        names.Add(name);
-                    }
+                    var element = document.GetElement(elementId);
+                    AddElementParameterNames(element, names);
                 }
+            }
+
+            var instances = new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilyInstance));
+
+            foreach (var element in instances)
+            {
+                AddElementParameterNames(element, names);
             }
 
             return names.ToList();
@@ -53,6 +57,37 @@ namespace ELVZone.Services
             }
 
             return names.ToList();
+        }
+
+        private static void AddProjectParameterNames(Document document, ISet<string> names)
+        {
+            var iterator = document.ParameterBindings.ForwardIterator();
+            iterator.Reset();
+            while (iterator.MoveNext())
+            {
+                var definition = iterator.Key;
+                if (!string.IsNullOrWhiteSpace(definition?.Name))
+                {
+                    names.Add(definition.Name);
+                }
+            }
+        }
+
+        private static void AddElementParameterNames(Element element, ISet<string> names)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            foreach (Parameter parameter in element.Parameters)
+            {
+                var name = parameter.Definition?.Name;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    names.Add(name);
+                }
+            }
         }
     }
 }

@@ -21,7 +21,12 @@ namespace ELVZone.Commands
                 var settingsService = new ViewZoneSettingsService();
                 var settings = settingsService.Load();
                 var optionsService = new RevitOptionsService();
-                var viewModel = new ViewZoneSettingsViewModel(settings, settingsService, optionsService, document);
+                var viewModel = new ViewZoneSettingsViewModel(
+                    settings,
+                    settingsService,
+                    optionsService,
+                    document,
+                    uiApplication.ActiveUIDocument.Selection.GetElementIds());
                 var window = new ViewZoneSettingsWindow
                 {
                     DataContext = viewModel

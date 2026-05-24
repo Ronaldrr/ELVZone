@@ -5,10 +5,12 @@
     <LangVersion>8.0</LangVersion>
     <Nullable>disable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
+    <Platform>x64</Platform>
     <AssemblyName>ELVZone</AssemblyName>
     <RootNamespace>ELVZone</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <REVIT2022_API Condition="'$(REVIT2022_API)' == ''">C:\Program Files\Autodesk\Revit 2022</REVIT2022_API>
+    <ExternalVersion>2022</ExternalVersion>
+    <DefineConstants>R2022</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,13 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="RevitAPI">
-      <HintPath>$(REVIT2022_API)\RevitAPI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>$(REVIT2022_API)\RevitAPIUI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <PackageReference Include="EvaRevitPlugin_$(ExternalVersion)" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

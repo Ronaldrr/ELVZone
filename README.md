@@ -33,10 +33,10 @@ Vertical angle and mounting height are read and stored in command data, but no 3
 
 ## Build
 
-The project targets Revit 2022 and .NET Framework 4.8. On the Windows build machine, set `REVIT2022_API` to the Revit 2022 installation folder that contains `RevitAPI.dll` and `RevitAPIUI.dll`, for example:
+The project targets Revit 2022 and .NET Framework 4.8. Revit API references are provided by the local `EvaRevitPlugin_2022` NuGet package, the same way as in `ELVSchemes`.
 
 ```cmd
-set REVIT2022_API=C:\Program Files\Autodesk\Revit 2022
+dotnet build ELVZone.csproj
 ```
 
-Build `ELVZone.csproj`, then place `ELVZone.dll` and `ELVZone.addin` in a Revit add-ins folder. Update the `<Assembly>` path in `ELVZone.addin` if the DLL is not located next to the manifest.
+Place `ELVZone.dll` and `ELVZone.addin` in a Revit add-ins folder. Update the `<Assembly>` path in `ELVZone.addin` if the DLL is not located next to the manifest.
