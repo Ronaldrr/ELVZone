@@ -1,0 +1,22 @@
+{
+  "manufacturer": "Rondo",
+  "model": "RS-10",
+  "type": "wall",
+  "ratedPowerW": 10,
+  "powerTapsW": [2.5, 5, 10],
+  "sensitivityDb_1W_1m": 92,
+  "frequencyRangeHz": [100, 15000],
+  "polarPattern": {
+    "source": "digitized_from_datasheet",
+    "angleUnit": "deg",
+    "levelUnit": "dB",
+    "frequencies": {
+      "1000": [
+        { "angle": 0, "db": 0 },
+        { "angle": 30, "db": -3 },
+        { "angle": 60, "db": -8 },
+        { "angle": 90, "db": -16 }
+      ]
+    }
+  }
+}

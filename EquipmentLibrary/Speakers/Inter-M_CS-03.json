@@ -1,0 +1,22 @@
+{
+  "manufacturer": "Inter-M",
+  "model": "CS-03",
+  "type": "ceiling",
+  "ratedPowerW": 3,
+  "powerTapsW": [0.75, 1.5, 3],
+  "sensitivityDb_1W_1m": 90,
+  "frequencyRangeHz": [100, 15000],
+  "polarPattern": {
+    "source": "digitized_from_datasheet",
+    "angleUnit": "deg",
+    "levelUnit": "dB",
+    "frequencies": {
+      "1000": [
+        { "angle": 0, "db": 0 },
+        { "angle": 30, "db": -3 },
+        { "angle": 60, "db": -8 },
+        { "angle": 90, "db": -16 }
+      ]
+    }
+  }
+}

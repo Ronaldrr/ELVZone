@@ -1,0 +1,37 @@
+<Window x:Class="ELVZone.SplCoverage.Views.SpeakerManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SPL Speaker Manager"
+        Width="920"
+        Height="620"
+        MinWidth="820"
+        MinHeight="520"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="18">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <TextBlock Text="{Binding StatusMessage}" MinWidth="360" Foreground="#406070" VerticalAlignment="Center"/>
+            <Button Content="Обновить" Command="{Binding ReloadCommand}" MinWidth="96" Height="32" Margin="8,0,0,0"/>
+            <Button Content="Привязать" Command="{Binding BindCommand}" MinWidth="112" Height="32" Margin="8,0,0,0" FontWeight="SemiBold"/>
+        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0">
+                <TextBox DockPanel.Dock="Top" Height="28" Margin="0,0,0,8" Text="{Binding ManufacturerFilter, UpdateSourceTrigger=PropertyChanged}"/>
+                <ListBox ItemsSource="{Binding FilteredSpeakers}" SelectedItem="{Binding SelectedSpeaker}" DisplayMemberPath="DisplayName"/>
+            </DockPanel>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="210"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Производитель" Margin="0,4"/><TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedSpeaker.Manufacturer}" Margin="0,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Модель" Margin="0,4"/><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedSpeaker.Model}" Margin="0,4"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип" Margin="0,4"/><TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedSpeaker.Type}" Margin="0,4"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Чувствительность, дБ" Margin="0,4"/><TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedSpeaker.SensitivityDb1W1M}" Margin="0,4"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Мощность подключения, Вт" Margin="0,4"/><ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding PowerTaps}" SelectedItem="{Binding SelectedPowerW}" Height="28"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Частота диаграммы, Гц" Margin="0,4"/><ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Frequencies}" SelectedItem="{Binding SelectedFrequencyHz}" Height="28"/>
+                <TextBox Grid.Row="6" Grid.ColumnSpan="2" Margin="0,16,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="{Binding SelectedSpeaker.LibraryFile}"/>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

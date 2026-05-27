@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
-    <Name>Place View Zones</Name>
+  <AddIn Type="Application">
+    <Name>CoverageTools for Revit</Name>
     <Assembly>ELVZone.dll</Assembly>
     <AddInId>77F55E18-0B44-4D69-8F61-4A1269532301</AddInId>
-    <FullClassName>ELVZone.Commands.PlaceViewZonesCommand</FullClassName>
+    <FullClassName>ELVZone.App</FullClassName>
     <VendorId>ELV</VendorId>
-    <VendorDescription>ELVZone</VendorDescription>
-  </AddIn>
-  <AddIn Type="Command">
-    <Name>View Zone Settings</Name>
-    <Assembly>ELVZone.dll</Assembly>
-    <AddInId>5246B151-B3A6-4B55-8C3A-30766B5677E7</AddInId>
-    <FullClassName>ELVZone.Commands.OpenViewZoneSettingsCommand</FullClassName>
-    <VendorId>ELV</VendorId>
-    <VendorDescription>ELVZone</VendorDescription>
+    <VendorDescription>CoverageTools for Revit</VendorDescription>
   </AddIn>
 </RevitAddIns>

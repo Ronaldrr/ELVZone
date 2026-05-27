@@ -1,42 +1,291 @@
-# ELVZone
+# CoverageTools for Revit
 
-Revit 2022 add-in for placing 2D camera view zones on a plan.
+Платформа Revit 2022 для расчета зон покрытия слаботочных систем.
 
-## Commands
+В проекте есть два модуля:
 
-- `ELVZone.Commands.PlaceViewZonesCommand` places four fan-shaped view zones for the selected camera element.
-- `ELVZone.Commands.OpenViewZoneSettingsCommand` opens the WPF settings window.
+- `CameraCoverage` - существующий модуль построения зон обзора камер;
+- `SplCoverage` - новый MVP-модуль расчета звукового давления SPL для систем оповещения.
 
-## Settings
+## Ribbon
 
-Settings are stored in:
+Плагин создает вкладку и панель Revit:
+
+```text
+Coverage Tools
+```
+
+Кнопки на панели:
+
+- `Camera Coverage`
+- `Camera Settings`
+- `SPL Calculate`
+- `SPL Speaker Manager`
+- `SPL Settings`
+- `SPL Clear`
+
+## Структура проекта
+
+```text
+Core/
+EquipmentLibrary/
+  Cameras/
+  Speakers/
+CameraCoverage/
+  Commands/ Models/ Services/ ViewModels/ Views/
+SplCoverage/
+  Commands/ Models/ Services/ ViewModels/ Views/
+SharedUI/
+Settings/
+Utils/
+```
+
+`CameraCoverage` сохраняет прежнюю архитектуру и поведение: WPF, MVVM, настройки, маппинг параметров, стили заливок, стили линий и построение веерных зон обзора.
+
+## SPL MVP
+
+Минимальный рабочий сценарий SPL-модуля:
+
+1. На активном плане выбрать `Room` или `Space`.
+2. Нажать `SPL Calculate`.
+3. Плагин ищет семейства громкоговорителей внутри выбранного помещения.
+4. Для каждого громкоговорителя сначала используются явные параметры `SPL_*`.
+5. Если параметров нет, модель подбирается по имени экземпляра, типа или семейства из JSON-библиотеки.
+6. Внутри помещения строится расчетная сетка 0.5 м.
+7. Точки расчета размещаются на заданной высоте плоскости расчета, по умолчанию 1.5 м от уровня плана.
+8. Высота громкоговорителя берется из выбранного параметра Revit, если он задан в `SPL Settings`.
+9. Для каждой ячейки рассчитывается SPL.
+10. На плане размещаются цветные ячейки `SPL_Cell`, а рассчитанные значения записываются в параметры.
+
+Формула расчета:
+
+```text
+SPL = SensitivityDb_1W_1m
+    + 10 * log10(PowerW)
+    - 20 * log10(DistanceM)
+    + DirectivityCorrectionDb
+```
+
+Если в помещении несколько громкоговорителей, уровни суммируются энергетически:
+
+```text
+TotalSPL = 10 * log10(sum(10 ^ (SPL_i / 10)))
+```
+
+## Как привязать громкоговорители
+
+Громкоговоритель не привязывается к помещению вручную.
+
+Логика такая:
+
+- громкоговоритель размещается в модели Revit;
+- плагин определяет его модель из JSON-библиотеки;
+- при расчете выбранного `Room` или `Space` плагин ищет громкоговорители, точка вставки которых находится внутри помещения.
+
+### Вариант 1. Автоматический маппинг по имени типа
+
+Это основной удобный сценарий.
+
+Если имя экземпляра, типа или семейства содержит идентификатор модели, плагин сам найдет JSON-файл.
+
+Например, все эти имена будут сопоставлены с файлом:
+
+```text
+EquipmentLibrary/Speakers/Inter-M_CS-03.json
+```
+
+Примеры допустимых имен:
+
+```text
+Inter-M CS-03
+Inter-M_CS-03
+Inter-M_CS-03.json
+```
+
+Сравнение не учитывает:
+
+- регистр;
+- пробелы;
+- `_`;
+- `-`;
+- `.`.
+
+То есть `Inter-M CS-03`, `inter_m_cs_03` и `Inter-M_CS-03.json` считаются одним и тем же идентификатором.
+
+Громкоговорители могут быть семействами категории:
+
+```text
+Пожарная сигнализация
+```
+
+или другой категории Revit. Для поиска источников SPL плагин больше не ограничивается категорией `Элементы узлов`.
+
+### Вариант 2. Явная привязка через SPL Speaker Manager
+
+1. Разместить громкоговорители на плане.
+2. Выделить нужные экземпляры.
+3. Нажать `SPL Speaker Manager`.
+4. Выбрать модель из JSON-библиотеки.
+5. Выбрать мощность подключения.
+6. Нажать `Привязать`.
+
+Команда запишет в выбранные элементы параметры:
+
+```text
+SPL_Manufacturer
+SPL_Model
+SPL_Type
+SPL_PowerW
+SPL_SensitivityDb
+SPL_LibraryFile
+```
+
+Если перед запуском `SPL Speaker Manager` ничего не выделено, команда попросит выбрать элементы громкоговорителей.
+
+Если у семейства нет нужных параметров или они недоступны для записи, будет показано предупреждение. Плагин не должен падать из-за отсутствующих параметров.
+
+## Библиотека громкоговорителей
+
+JSON-файлы громкоговорителей находятся здесь:
+
+```text
+EquipmentLibrary/Speakers/
+```
+
+В проект добавлены стартовые файлы:
+
+- `Inter-M_CS-03.json`
+- `Inter-M_CS-06.json`
+- `Rondo_RS-10.json`
+
+При сборке эти файлы копируются в выходную папку рядом с `ELVZone.dll`.
+
+Путь к библиотеке можно изменить через `SPL Settings`.
+
+
+## Высоты в SPL-расчете
+
+В `SPL Settings` добавлены два параметра высоты:
+
+- `Параметр высоты установки` - имя параметра Revit, из которого считывается высота громкоговорителя;
+- `Высота плоскости расчета, м` - высота расчетной сетки от уровня активного плана, по умолчанию `1.5`.
+
+Если параметр высоты установки выбран и заполнен, его значение используется как высота громкоговорителя от уровня размещения элемента. Если параметр Revit имеет тип длины, значение читается во внутренних единицах Revit. Если параметр текстовый или числовой строкой, значение считается метрами.
+
+Если параметр высоты установки не выбран или пустой, используется фактическая Z-координата точки вставки семейства.
+
+## Препятствия и огибание звуком
+
+На текущем MVP препятствия не учитываются.
+
+Сейчас расчет учитывает:
+
+- расстояние от громкоговорителя до точки расчета в 3D;
+- мощность подключения;
+- чувствительность громкоговорителя;
+- диаграмму направленности, если она включена и есть в JSON.
+
+Сейчас расчет не учитывает:
+
+- акустические тени от стен, колонн и оборудования;
+- огибание звуком препятствий;
+- отражения;
+- RT60;
+- поглощение материалами;
+- октавный расчет.
+
+То есть стена между громкоговорителем и точкой расчета пока не уменьшает SPL. Это отдельный будущий этап, его лучше делать явно: сначала простой line-of-sight/экранирование, затем при необходимости более сложную акустику.
+
+## Визуализация SPL
+
+Для визуализации используется семейство:
+
+```text
+SPL_Cell
+```
+
+Категория семейства ячейки:
+
+```text
+Элементы узлов
+```
+
+Ожидаемые типы семейства:
+
+```text
+SPL_Grey
+SPL_Yellow
+SPL_Orange
+SPL_Red
+```
+
+Цветовая логика:
+
+```text
+SPL < RequiredMin        -> SPL_Grey
+RequiredMin <= SPL < 80  -> SPL_Yellow
+80 <= SPL < 90           -> SPL_Orange
+SPL >= 90                -> SPL_Red
+```
+
+Параметры, которые заполняются у `SPL_Cell`:
+
+```text
+SPL_Value
+SPL_Range
+SPL_RoomId
+SPL_RoomName
+SPL_SourceSpeakers
+SPL_CalculationId
+```
+
+Текст в модели пока не размещается. Значение SPL хранится в параметре `SPL_Value`.
+
+## Очистка SPL
+
+Команда `SPL Clear` удаляет размещенные ячейки `SPL_Cell`.
+
+Если выбран `Room` или `Space`, удаляются ячейки только этого помещения.
+Если помещение не выбрано, удаляются все SPL-ячейки, у которых заполнен `SPL_CalculationId`.
+
+## Настройки
+
+Настройки SPL хранятся здесь:
+
+```text
+%APPDATA%/CoverageTools/settings.json
+```
+
+В настройках SPL есть:
+
+- путь к JSON-библиотеке;
+- размер ячейки;
+- минимально допустимый SPL;
+- частота расчета;
+- параметр Revit для высоты установки громкоговорителя;
+- высота плоскости расчета, по умолчанию 1.5 м;
+- учет диаграммы направленности;
+- имя семейства `SPL_Cell`;
+- имена типов для цветовых диапазонов;
+- импорт и экспорт настроек.
+
+Настройки камер сохраняют прежний путь для совместимости:
 
 ```text
 %APPDATA%/ViewZonePlugin/settings.json
 ```
 
-The settings window supports:
-
-- selecting element parameters for horizontal angle, vertical angle, mounting height, zone lengths 1-4, and total length;
-- enabling or disabling every parameter mapping;
-- selecting `FilledRegionType` and line style for zones 1-4;
-- enabling or disabling fills and outline lines per zone;
-- saving, importing, exporting, and resetting JSON settings.
-
-## Geometry
-
-Zones are created on the active `ViewPlan` as 2D fan sectors from the camera insertion point and facing direction.
-The horizontal angle defines the fan opening. Zone lengths 1-4 are treated as consecutive segment lengths and are clamped by total length.
-Arcs are approximated by line segments.
-
-Vertical angle and mounting height are read and stored in command data, but no 3D view pyramid is created yet.
-
-## Build
-
-The project targets Revit 2022 and .NET Framework 4.8. Revit API references are provided by the local `EvaRevitPlugin_2022` NuGet package, the same way as in `ELVSchemes`.
+## Сборка
 
 ```cmd
 dotnet build ELVZone.csproj
 ```
 
-Place `ELVZone.dll` and `ELVZone.addin` in a Revit add-ins folder. Update the `<Assembly>` path in `ELVZone.addin` if the DLL is not located next to the manifest.
+Проект рассчитан на:
+
+- Revit 2022;
+- .NET Framework 4.8;
+- WPF;
+- MVVM;
+- Revit API из локального пакета `EvaRevitPlugin_2022`;
+- JSON через `Newtonsoft.Json`.

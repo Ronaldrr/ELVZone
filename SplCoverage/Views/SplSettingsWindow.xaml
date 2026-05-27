@@ -1,0 +1,45 @@
+<Window x:Class="ELVZone.SplCoverage.Views.SplSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SPL Settings"
+        Width="760"
+        Height="520"
+        MinWidth="680"
+        MinHeight="460"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <Style TargetType="TextBlock"><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="Margin" Value="0,0,10,0"/></Style>
+        <Style TargetType="TextBox"><Setter Property="Height" Value="28"/><Setter Property="Margin" Value="0,4"/></Style>
+        <Style TargetType="ComboBox"><Setter Property="Height" Value="28"/><Setter Property="Margin" Value="0,4"/><Setter Property="IsEditable" Value="True"/></Style>
+        <Style TargetType="Button"><Setter Property="MinWidth" Value="96"/><Setter Property="Height" Value="32"/><Setter Property="Margin" Value="8,0,0,0"/></Style>
+    </Window.Resources>
+    <DockPanel Margin="18">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <TextBlock Text="{Binding StatusMessage}" MinWidth="260" Foreground="#406070"/>
+            <Button Content="Импорт" Click="ImportButton_Click"/>
+            <Button Content="Экспорт" Click="ExportButton_Click"/>
+            <Button Content="Сброс" Click="ResetButton_Click"/>
+            <Button Content="Сохранить" Click="SaveButton_Click" FontWeight="SemiBold"/>
+        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Путь к JSON-библиотеке"/><TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.SpeakerLibraryPath, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Размер ячейки, м"/><TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Settings.CellSizeMeters, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Минимальный SPL, дБ"/><TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Settings.RequiredMinSpl, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Частота расчета, Гц"/><TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Settings.CalculationFrequencyHz, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Параметр высоты установки"/><ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.SpeakerMountingHeightParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Высота плоскости расчета, м"/><TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Settings.CalculationPlaneHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Учет диаграммы"/><CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Settings.UseDirectivity}" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Семейство ячейки"/><TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Settings.CellFamilyName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Тип Grey"/><TextBox Grid.Row="8" Grid.Column="1" Text="{Binding Settings.GreyTypeName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="9" Grid.Column="0" Text="Тип Yellow"/><TextBox Grid.Row="9" Grid.Column="1" Text="{Binding Settings.YellowTypeName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="10" Grid.Column="0" Text="Тип Orange"/><TextBox Grid.Row="10" Grid.Column="1" Text="{Binding Settings.OrangeTypeName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="11" Grid.Column="0" Text="Тип Red"/><TextBox Grid.Row="11" Grid.Column="1" Text="{Binding Settings.RedTypeName, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </DockPanel>
+</Window>
