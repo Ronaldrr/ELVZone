@@ -16,51 +16,57 @@ namespace ELVZone.Models
         public ParameterSetting MountingHeightParameter { get; set; }
 
         [DataMember(Order = 4)]
-        public ParameterSetting Zone1LengthParameter { get; set; }
+        public ParameterSetting DeadZoneLengthParameter { get; set; }
 
         [DataMember(Order = 5)]
-        public ParameterSetting Zone2LengthParameter { get; set; }
+        public ParameterSetting Zone1LengthParameter { get; set; }
 
         [DataMember(Order = 6)]
-        public ParameterSetting Zone3LengthParameter { get; set; }
+        public ParameterSetting Zone2LengthParameter { get; set; }
 
         [DataMember(Order = 7)]
-        public ParameterSetting Zone4LengthParameter { get; set; }
+        public ParameterSetting Zone3LengthParameter { get; set; }
 
         [DataMember(Order = 8)]
-        public ParameterSetting TotalLengthParameter { get; set; }
+        public ParameterSetting Zone4LengthParameter { get; set; }
 
         [DataMember(Order = 9)]
-        public List<ZoneStyleSetting> ZoneStyles { get; set; }
+        public ParameterSetting TotalLengthParameter { get; set; }
 
         [DataMember(Order = 10)]
-        public double DefaultHorizontalAngleDegrees { get; set; }
+        public List<ZoneStyleSetting> ZoneStyles { get; set; }
 
         [DataMember(Order = 11)]
-        public double DefaultVerticalAngleDegrees { get; set; }
+        public double DefaultHorizontalAngleDegrees { get; set; }
 
         [DataMember(Order = 12)]
-        public double DefaultMountingHeightMeters { get; set; }
+        public double DefaultVerticalAngleDegrees { get; set; }
 
         [DataMember(Order = 13)]
-        public double DefaultZone1LengthMeters { get; set; }
+        public double DefaultMountingHeightMeters { get; set; }
 
         [DataMember(Order = 14)]
-        public double DefaultZone2LengthMeters { get; set; }
+        public double DefaultDeadZoneLengthMeters { get; set; }
 
         [DataMember(Order = 15)]
-        public double DefaultZone3LengthMeters { get; set; }
+        public double DefaultZone1LengthMeters { get; set; }
 
         [DataMember(Order = 16)]
-        public double DefaultZone4LengthMeters { get; set; }
+        public double DefaultZone2LengthMeters { get; set; }
 
         [DataMember(Order = 17)]
-        public double DefaultTotalLengthMeters { get; set; }
+        public double DefaultZone3LengthMeters { get; set; }
 
         [DataMember(Order = 18)]
-        public double AnalysisBottomHeightMeters { get; set; }
+        public double DefaultZone4LengthMeters { get; set; }
 
         [DataMember(Order = 19)]
+        public double DefaultTotalLengthMeters { get; set; }
+
+        [DataMember(Order = 20)]
+        public double AnalysisBottomHeightMeters { get; set; }
+
+        [DataMember(Order = 21)]
         public double AnalysisTopHeightMeters { get; set; }
 
         public static ViewZoneSettings CreateDefault()
@@ -70,6 +76,7 @@ namespace ELVZone.Models
                 HorizontalAngleParameter = new ParameterSetting(),
                 VerticalAngleParameter = new ParameterSetting(),
                 MountingHeightParameter = new ParameterSetting(),
+                DeadZoneLengthParameter = new ParameterSetting(),
                 Zone1LengthParameter = new ParameterSetting(),
                 Zone2LengthParameter = new ParameterSetting(),
                 Zone3LengthParameter = new ParameterSetting(),
@@ -80,11 +87,13 @@ namespace ELVZone.Models
                     new ZoneStyleSetting(),
                     new ZoneStyleSetting(),
                     new ZoneStyleSetting(),
+                    new ZoneStyleSetting(),
                     new ZoneStyleSetting()
                 },
                 DefaultHorizontalAngleDegrees = 60,
                 DefaultVerticalAngleDegrees = 45,
                 DefaultMountingHeightMeters = 3,
+                DefaultDeadZoneLengthMeters = 0,
                 DefaultZone1LengthMeters = 5,
                 DefaultZone2LengthMeters = 5,
                 DefaultZone3LengthMeters = 5,
@@ -100,6 +109,7 @@ namespace ELVZone.Models
             HorizontalAngleParameter = HorizontalAngleParameter ?? new ParameterSetting();
             VerticalAngleParameter = VerticalAngleParameter ?? new ParameterSetting();
             MountingHeightParameter = MountingHeightParameter ?? new ParameterSetting();
+            DeadZoneLengthParameter = DeadZoneLengthParameter ?? new ParameterSetting();
             Zone1LengthParameter = Zone1LengthParameter ?? new ParameterSetting();
             Zone2LengthParameter = Zone2LengthParameter ?? new ParameterSetting();
             Zone3LengthParameter = Zone3LengthParameter ?? new ParameterSetting();
@@ -111,7 +121,12 @@ namespace ELVZone.Models
                 AnalysisTopHeightMeters = AnalysisBottomHeightMeters + 2;
             }
 
-            while (ZoneStyles.Count < 4)
+            if (ZoneStyles.Count == 4)
+            {
+                ZoneStyles.Insert(0, new ZoneStyleSetting());
+            }
+
+            while (ZoneStyles.Count < 5)
             {
                 ZoneStyles.Add(new ZoneStyleSetting());
             }

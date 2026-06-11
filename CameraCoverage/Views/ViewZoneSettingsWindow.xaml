@@ -66,6 +66,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Горизонтальный угол"/>
@@ -86,47 +87,53 @@
                     <TextBlock Grid.Row="2" Grid.Column="3" Text="По умолчанию, м"/>
                     <TextBox Grid.Row="2" Grid.Column="4" Text="{Binding Settings.DefaultMountingHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Длина зоны 1"/>
-                    <CheckBox Grid.Row="3" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone1LengthParameter.IsEnabled}"/>
-                    <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone1LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Длина мертвой зоны"/>
+                    <CheckBox Grid.Row="3" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.DeadZoneLengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.DeadZoneLengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Grid.Row="3" Grid.Column="3" Text="По умолчанию, м"/>
-                    <TextBox Grid.Row="3" Grid.Column="4" Text="{Binding Settings.DefaultZone1LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Row="3" Grid.Column="4" Text="{Binding Settings.DefaultDeadZoneLengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Длина зоны 2"/>
-                    <CheckBox Grid.Row="4" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone2LengthParameter.IsEnabled}"/>
-                    <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone2LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Длина зоны 1"/>
+                    <CheckBox Grid.Row="4" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone1LengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone1LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Grid.Row="4" Grid.Column="3" Text="По умолчанию, м"/>
-                    <TextBox Grid.Row="4" Grid.Column="4" Text="{Binding Settings.DefaultZone2LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Row="4" Grid.Column="4" Text="{Binding Settings.DefaultZone1LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Длина зоны 3"/>
-                    <CheckBox Grid.Row="5" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone3LengthParameter.IsEnabled}"/>
-                    <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone3LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Длина зоны 2"/>
+                    <CheckBox Grid.Row="5" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone2LengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone2LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Grid.Row="5" Grid.Column="3" Text="По умолчанию, м"/>
-                    <TextBox Grid.Row="5" Grid.Column="4" Text="{Binding Settings.DefaultZone3LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Row="5" Grid.Column="4" Text="{Binding Settings.DefaultZone2LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Длина зоны 4"/>
-                    <CheckBox Grid.Row="6" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone4LengthParameter.IsEnabled}"/>
-                    <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone4LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Длина зоны 3"/>
+                    <CheckBox Grid.Row="6" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone3LengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone3LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Grid.Row="6" Grid.Column="3" Text="По умолчанию, м"/>
-                    <TextBox Grid.Row="6" Grid.Column="4" Text="{Binding Settings.DefaultZone4LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Row="6" Grid.Column="4" Text="{Binding Settings.DefaultZone3LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Общая длина"/>
-                    <CheckBox Grid.Row="7" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.TotalLengthParameter.IsEnabled}"/>
-                    <ComboBox Grid.Row="7" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.TotalLengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Длина зоны 4"/>
+                    <CheckBox Grid.Row="7" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.Zone4LengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="7" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.Zone4LengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Grid.Row="7" Grid.Column="3" Text="По умолчанию, м"/>
-                    <TextBox Grid.Row="7" Grid.Column="4" Text="{Binding Settings.DefaultTotalLengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Grid.Row="7" Grid.Column="4" Text="{Binding Settings.DefaultZone4LengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Нижняя высота анализа h1"/>
-                    <TextBlock Grid.Row="8" Grid.Column="1" Text=""/>
-                    <TextBlock Grid.Row="8" Grid.Column="2" Text="От уровня активного плана"/>
-                    <TextBlock Grid.Row="8" Grid.Column="3" Text="h1, м"/>
-                    <TextBox Grid.Row="8" Grid.Column="4" Text="{Binding Settings.AnalysisBottomHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Общая длина"/>
+                    <CheckBox Grid.Row="8" Grid.Column="1" Content="Вкл." IsChecked="{Binding Settings.TotalLengthParameter.IsEnabled}"/>
+                    <ComboBox Grid.Row="8" Grid.Column="2" ItemsSource="{Binding ParameterNames}" Text="{Binding Settings.TotalLengthParameter.ParameterName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="8" Grid.Column="3" Text="По умолчанию, м"/>
+                    <TextBox Grid.Row="8" Grid.Column="4" Text="{Binding Settings.DefaultTotalLengthMeters, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Верхняя высота анализа h2"/>
+                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Нижняя высота анализа h1"/>
                     <TextBlock Grid.Row="9" Grid.Column="1" Text=""/>
                     <TextBlock Grid.Row="9" Grid.Column="2" Text="От уровня активного плана"/>
-                    <TextBlock Grid.Row="9" Grid.Column="3" Text="h2, м"/>
-                    <TextBox Grid.Row="9" Grid.Column="4" Text="{Binding Settings.AnalysisTopHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="9" Grid.Column="3" Text="h1, м"/>
+                    <TextBox Grid.Row="9" Grid.Column="4" Text="{Binding Settings.AnalysisBottomHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Верхняя высота анализа h2"/>
+                    <TextBlock Grid.Row="10" Grid.Column="1" Text=""/>
+                    <TextBlock Grid.Row="10" Grid.Column="2" Text="От уровня активного плана"/>
+                    <TextBlock Grid.Row="10" Grid.Column="3" Text="h2, м"/>
+                    <TextBox Grid.Row="10" Grid.Column="4" Text="{Binding Settings.AnalysisTopHeightMeters, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
 
                 <TextBlock Text="Стили зон" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>

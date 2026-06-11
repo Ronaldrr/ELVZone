@@ -9,6 +9,7 @@ namespace ELVZone.Geometry
         public double HorizontalAngleRadians { get; set; }
         public double VerticalAngleRadians { get; set; }
         public double MountingHeightFeet { get; set; }
+        public double DeadZoneLengthFeet { get; set; }
         public double[] ZoneLengthsFeet { get; set; }
         public double TotalLengthFeet { get; set; }
         public double AnalysisBottomHeightFeet { get; set; }

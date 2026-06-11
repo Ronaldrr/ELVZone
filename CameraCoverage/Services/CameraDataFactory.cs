@@ -31,6 +31,10 @@ namespace ELVZone.Services
                     camera,
                     settings.MountingHeightParameter,
                     settings.DefaultMountingHeightMeters),
+                DeadZoneLengthFeet = _parameterReader.ReadLengthFeet(
+                    camera,
+                    settings.DeadZoneLengthParameter,
+                    settings.DefaultDeadZoneLengthMeters),
                 ZoneLengthsFeet = new[]
                 {
                     _parameterReader.ReadLengthFeet(camera, settings.Zone1LengthParameter, settings.DefaultZone1LengthMeters),

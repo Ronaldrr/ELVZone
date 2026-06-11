@@ -28,10 +28,18 @@ namespace ELVZone.Geometry
                 planeElevation,
                 obstacles ?? new List<PlanObstacleSegment>());
             var innerRadius = 0.0;
-
-            for (var i = 0; i < 4; i++)
+            var zoneLengths = new[]
             {
-                var zoneLength = data.ZoneLengthsFeet[i];
+                data.DeadZoneLengthFeet,
+                data.ZoneLengthsFeet[0],
+                data.ZoneLengthsFeet[1],
+                data.ZoneLengthsFeet[2],
+                data.ZoneLengthsFeet[3]
+            };
+
+            for (var i = 0; i < zoneLengths.Length; i++)
+            {
+                var zoneLength = zoneLengths[i];
                 var outerRadius = Math.Min(totalRadius, innerRadius + Math.Max(0, zoneLength));
                 if (outerRadius - innerRadius > MinLength)
                 {

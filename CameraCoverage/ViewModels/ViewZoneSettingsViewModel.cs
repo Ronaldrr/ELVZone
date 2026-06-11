@@ -151,9 +151,10 @@ namespace ELVZone.ViewModels
         private void RebuildZoneRows()
         {
             ZoneRows.Clear();
-            for (var i = 0; i < 4; i++)
+            ZoneRows.Add(new ZoneStyleRowViewModel("Мертвая зона", _settings.ZoneStyles[0]));
+            for (var i = 1; i < 5; i++)
             {
-                ZoneRows.Add(new ZoneStyleRowViewModel($"Зона {i + 1}", _settings.ZoneStyles[i]));
+                ZoneRows.Add(new ZoneStyleRowViewModel($"Зона {i}", _settings.ZoneStyles[i]));
             }
         }
     }
